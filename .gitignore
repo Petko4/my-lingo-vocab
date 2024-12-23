@@ -1,0 +1,100 @@
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+venv/
+env/
+.env
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Testing
+coverage/
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+
+# Production
+frontend/build/
+frontend/dist/
+backend/dist/
+
+# Development
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Frontend specific
+# TypeScript
+*.tsbuildinfo
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# Backend specific
+# Config files with sensitive data
+backend/app/core/config.py
+
+# Python
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+.python-version
+.env
+.venv
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+
+# Distribution / packaging
+dist/
+build/
+eggs/
+*.egg-info/
+*.egg
+
+# VS Code settings
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Cache directories
+.cache/
+.parcel-cache/
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional stylelint cache
+.stylelintcache
+
+# dotenv environment variable files
+.env*
+!.env.example

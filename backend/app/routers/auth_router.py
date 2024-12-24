@@ -24,7 +24,7 @@ router = APIRouter(
 async def sign_user(user: UserCreate, user_service: UserService = Depends(get_user_service)) -> UserResponse:
     try:
         new_user = user_service.add_user(
-            user.username, user.email, user.password)
+            user.username, user.email, user.password, user.native_language)
         return new_user
 
     except UserAlreadyExistsError as error:

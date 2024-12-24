@@ -11,6 +11,7 @@ class UserCreate(BaseModel):
         pattern=r'^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$',
         examples=["pepa@example.com"])
     password: str
+    native_language: str
 
     @field_validator("password")
     def validate_password(cls, v):
@@ -31,8 +32,10 @@ class UserCreate(BaseModel):
 
 
 class UserResponse(BaseModel):
+    id: int
     username: str
-    email: str | None = None
+    email: str
+    native_language: str
 
 
 # class UserLogin(BaseModel):

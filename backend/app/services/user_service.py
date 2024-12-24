@@ -18,10 +18,10 @@ class UserService:
             raise UserNotFoundError
         return user
 
-    def add_user(self, username, email, password) -> User | None:
+    def add_user(self, username, email, password, native_language) -> User | None:
         hashed_password = self._password_service.get_password_hash(password)
         user = User(username=username, email=email,
-                    hashed_password=hashed_password)
+                    hashed_password=hashed_password, native_language=native_language)
         try:
             self._db.add(user)
             self._db.commit()

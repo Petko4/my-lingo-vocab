@@ -20,10 +20,13 @@ export function SignUpForm({ onSubmit, isLoading, apiError }: SignUpFormProps) {
   const [emailError, setEmailError] = useState("");
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [language, setLanguage] = useState("");
+  const [languageError, setLanguageError] = useState("");
 
   const nameDebounceTimer = useRef<undefined | number>(undefined);
   const emailDebounceTimer = useRef<undefined | number>(undefined);
   const passwordDebounceTimer = useRef<undefined | number>(undefined);
+  const languageDebounceTimer = useRef<undefined | number>(undefined);
 
   const handleOnSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -31,6 +34,7 @@ export function SignUpForm({ onSubmit, isLoading, apiError }: SignUpFormProps) {
       username,
       email,
       password,
+      native_language: language,
     });
   };
 
@@ -90,6 +94,26 @@ export function SignUpForm({ onSubmit, isLoading, apiError }: SignUpFormProps) {
     }, DEBOUNCE_VALIDATION_TIMEOUT);
   };
 
+  const handleLanguageOnChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const newLanguage = event.target.value;
+
+    setLanguageError("");
+    setLanguage(newLanguage);
+
+    if (languageDebounceTimer.current) {
+      clearTimeout(languageDebounceTimer.current);
+    }
+    languageDebounceTimer.current = setTimeout(() => {
+      if (newLanguage.length < 2) {
+        setLanguageError(
+          "Native language has to be at least 2 characters long"
+        );
+      }
+    }, DEBOUNCE_VALIDATION_TIMEOUT);
+  };
+
   return (
     <Stack sx={{ width: "20%" }} alignItems="center" spacing={1}>
       <Paper sx={{ padding: "2rem", width: "100%" }} elevation={8}>
@@ -130,6 +154,18 @@ export function SignUpForm({ onSubmit, isLoading, apiError }: SignUpFormProps) {
               required
               error={!!passwordError}
               helperText={passwordError}
+            />
+            <TextField
+              id="language"
+              label="native language"
+              type="language"
+              name="native language"
+              variant="standard"
+              value={language}
+              onChange={handleLanguageOnChange}
+              required
+              error={!!languageError}
+              helperText={languageError}
             />
             <Button
               type="submit"

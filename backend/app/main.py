@@ -38,7 +38,7 @@ async def lifespan(app: FastAPI):
 
     scheduler.shutdown()
 
-origins = ["http://localhost:5173"]
+origins = ["http://localhost:5173", "http://127.0.0.1:5173"]
 
 app = FastAPI(lifespan=lifespan, debug=True)
 app.add_middleware(

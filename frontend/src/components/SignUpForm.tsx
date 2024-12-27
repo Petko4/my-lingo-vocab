@@ -6,6 +6,7 @@ import {
   EMAIL_VALIDATION_PATTERN,
   PASSWORD_VALIDATION_PATTERN,
 } from "../constants";
+import { Form } from "./Form";
 
 interface SignUpFormProps {
   onSubmit: (data: SignUpFormData) => Promise<void>;
@@ -115,65 +116,57 @@ export function SignUpForm({ onSubmit, isLoading, apiError }: SignUpFormProps) {
   };
 
   return (
-    <Stack sx={{ width: "20%" }} alignItems="center" spacing={1}>
-      <Paper sx={{ padding: "2rem", width: "100%" }} elevation={8}>
-        <h1>Sign up</h1>
-        <form onSubmit={handleOnSubmit}>
-          <Stack spacing={4}>
-            <TextField
-              id="username"
-              label="username"
-              name="username"
-              variant="standard"
-              required
-              value={username}
-              onChange={handleUsernameOnChange}
-              error={!!usernameError}
-              helperText={usernameError}
-            />
-            <TextField
-              id="email"
-              label="email"
-              name="email"
-              type="email"
-              variant="standard"
-              value={email}
-              onChange={handleEmailOnChange}
-              required
-              error={!!emailError}
-              helperText={emailError}
-            />
-            <TextField
-              id="password"
-              label="password"
-              type="password"
-              name="password"
-              variant="standard"
-              value={password}
-              onChange={handlePasswordOnChange}
-              required
-              error={!!passwordError}
-              helperText={passwordError}
-            />
-            <TextField
-              id="language"
-              label="native language"
-              type="language"
-              name="native language"
-              variant="standard"
-              value={language}
-              onChange={handleLanguageOnChange}
-              required
-              error={!!languageError}
-              helperText={languageError}
-            />
-            <Button type="submit" variant="text" disabled={isLoading}>
-              {isLoading ? <>Sigining up&hellip;</> : "Sign Up"}
-            </Button>
-          </Stack>
-        </form>
-      </Paper>
-      <FormHelperText error>{apiError && apiError}</FormHelperText>
-    </Stack>
+    <Form title="Sign up" onSubmit={handleOnSubmit} apiError="apiError">
+      <TextField
+        id="username"
+        label="username"
+        name="username"
+        variant="standard"
+        required
+        value={username}
+        onChange={handleUsernameOnChange}
+        error={!!usernameError}
+        helperText={usernameError}
+      />
+      <TextField
+        id="email"
+        label="email"
+        name="email"
+        type="email"
+        variant="standard"
+        value={email}
+        onChange={handleEmailOnChange}
+        required
+        error={!!emailError}
+        helperText={emailError}
+      />
+      <TextField
+        id="password"
+        label="password"
+        type="password"
+        name="password"
+        variant="standard"
+        value={password}
+        onChange={handlePasswordOnChange}
+        required
+        error={!!passwordError}
+        helperText={passwordError}
+      />
+      <TextField
+        id="language"
+        label="native language"
+        type="language"
+        name="native language"
+        variant="standard"
+        value={language}
+        onChange={handleLanguageOnChange}
+        required
+        error={!!languageError}
+        helperText={languageError}
+      />
+      <Button type="submit" variant="text" disabled={isLoading}>
+        {isLoading ? <>Sigining up&hellip;</> : "Sign Up"}
+      </Button>
+    </Form>
   );
 }

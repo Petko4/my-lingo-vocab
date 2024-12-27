@@ -6,7 +6,6 @@ import {
   IconButton,
   Stack,
   Toolbar,
-  Typography,
 } from "@mui/material";
 import "./App.css";
 import { useContext } from "react";
@@ -69,7 +68,7 @@ export function App() {
         </Box>
         <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
           <Routes>
-            <Route path="/vocabulary" element={<VocabularyView />} />
+            <Route path="/vocabulary/*" element={<VocabularyView />} />
             <Route path="/exercise" element={<ExerciseView />} />
             <Route path="/profile" element={<ProfileView />} />
           </Routes>

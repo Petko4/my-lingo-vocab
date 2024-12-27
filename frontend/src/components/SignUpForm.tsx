@@ -167,16 +167,7 @@ export function SignUpForm({ onSubmit, isLoading, apiError }: SignUpFormProps) {
               error={!!languageError}
               helperText={languageError}
             />
-            <Button
-              type="submit"
-              variant="text"
-              sx={{
-                ":focus": {
-                  outline: "none",
-                },
-              }}
-              disabled={isLoading}
-            >
+            <Button type="submit" variant="text" disabled={isLoading}>
               {isLoading ? <>Sigining up&hellip;</> : "Sign Up"}
             </Button>
           </Stack>

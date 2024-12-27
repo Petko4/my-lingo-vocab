@@ -2,13 +2,11 @@ import { Box } from "@mui/material";
 import { SignInForm } from "../components/SignInForm";
 import { useContext, useState } from "react";
 import { SignInFormData } from "../types/User";
-import { useNavigate } from "react-router";
 import { AuthContext } from "../contexts/AuthContext";
 
 export function SignInPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState(undefined);
-  const navigate = useNavigate();
 
   const { signIn } = useContext(AuthContext);
 

@@ -55,16 +55,7 @@ export function SignInForm({ isLoading, onSubmit, apiError }: SignInFormProsp) {
               onChange={handlePasswordOnChange}
               required
             />
-            <Button
-              type="submit"
-              variant="text"
-              sx={{
-                ":focus": {
-                  outline: "none",
-                },
-              }}
-              disabled={isLoading}
-            >
+            <Button type="submit" variant="text" disabled={isLoading}>
               {isLoading ? <>Sigining in&hellip;</> : "Sign in"}
             </Button>
           </Stack>

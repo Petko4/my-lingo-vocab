@@ -1,6 +1,5 @@
+import { API_URL } from "../constants";
 import { SignInFormData, SignUpFormData } from "../types/User";
-
-export const API_URL = "http://localhost:8000";
 
 export const signUpApi = async (data: SignUpFormData) => {
   const response = await fetch(`${API_URL}/auth/signup`, {
@@ -24,13 +23,11 @@ export const signInApi = async (data: SignInFormData) => {
   const params = new URLSearchParams();
   params.append("username", data.username);
   params.append("password", data.password);
-  console.log("SignInAPI");
   const headers = {
     "Content-Type": "application/x-www-form-urlencoded",
   };
 
   try {
-    console.log("in Tryt");
     const response = await fetch(`${API_URL}/auth/signin`, {
       method: "POST",
       headers,

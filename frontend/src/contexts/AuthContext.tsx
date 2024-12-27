@@ -1,7 +1,8 @@
 import React, { createContext, useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { SignInFormData } from "../types/User";
-import { API_URL, signInApi } from "../api/auth";
+import { signInApi } from "../api/auth";
+import { ACCESS_TOKEN_REFRESH, API_URL } from "../constants";
 
 interface AuthContext {
   signIn: (data: SignInFormData) => Promise<void>;
@@ -116,7 +117,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       const data = await response.json();
       setAccessToken(data.access_token);
 
-      const refreshTime = 60 * 1000; // 1min
+      const refreshTime = ACCESS_TOKEN_REFRESH;
       const timer = setTimeout(refreshAccessToken, refreshTime);
       setRefreshTimer(timer);
     } catch (error) {
@@ -135,12 +136,12 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       // }
 
       setAccessToken(response.access_token);
-      const refreshTime = 60 * 1000;
+      const refreshTime = ACCESS_TOKEN_REFRESH;
       const timer = setTimeout(refreshAccessToken, refreshTime);
       setRefreshTimer(timer);
 
       // DO some another stuff like load user info
-      navigate("/home");
+      navigate("/app/vocabulary");
     } catch (error) {
       console.error(error);
       throw new Error("Invalid credentials");

@@ -1,5 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
+from fastapi import Depends
+from fastapi.security import OAuth2PasswordBearer
 from datetime import datetime, timezone
 
 from app.core.config import settings
@@ -10,6 +12,7 @@ from app.services.user_service import UserService
 from app.services.password_service import PassswordService
 from app.services.token_service import TokenService
 from app.models.token_model import RefreshToken
+from app.models.user_model import User
 from app.exceptions.base_exceptions import DatabaseError
 
 
@@ -90,14 +93,21 @@ class AuthService:
             self._db.rollback()
             raise DatabaseError(f"Failed to revoke user tokens: {str(error)}")
 
-    # def cleanup_expired_tokens(self):
-    #     try:
-    #         self._db.query(RefreshToken)\
-    #             .filter(
-    #                 (RefreshToken.expires_at < datetime.now(timezone.utc)) |
-    #                 (RefreshToken.revoked == True)
-    #         ).delete()
-    #         self._db.commit()
-    #     except SQLAlchemyError as error:
-    #         self._db.rollback()
-    #         raise DatabaseError(f"Faled to cleanup tokens: {str(error)}")
+    @staticmethod
+    async def get_current_user(
+        token: str,
+        token_service: TokenService,
+        db: Session
+    ):
+        print("in get_current_user")
+        try:
+            user_id = token_service.get_user_id_from_token(token)
+            user = db.query(User).get(user_id)
+            if not user:
+                raise UserNotFoundError
+            return user
+        except TokenExpiredError as error:
+            print(f"Token expired: {str(error)}")
+            return user
+        except InvalidTokenError as error:
+            print(f"Invalid token: {str(error)}")

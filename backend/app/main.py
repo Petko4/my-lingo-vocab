@@ -5,7 +5,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from contextlib import asynccontextmanager
 
-from app.routers import auth_router
+from app.routers import auth_router, vocabulary_router
 from app.core.database import Base, engine
 from app.tasks import cleanup_expired_tokens
 
@@ -49,6 +49,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(auth_router.router)
+app.include_router(vocabulary_router.router)
 
 init_db()
 

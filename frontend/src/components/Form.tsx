@@ -14,7 +14,16 @@ export function Form({
   onSubmit,
 }: PropsWithChildren<FormProps>) {
   return (
-    <Stack sx={{ width: "25%" }} alignItems="center" spacing={1}>
+    <Stack
+      sx={{
+        width: {
+          xs: "80%",
+          sm: "33%",
+        },
+      }}
+      alignItems="center"
+      spacing={1}
+    >
       <Paper sx={{ padding: "2rem", width: "100%" }} elevation={8}>
         {title && <h1>{title}</h1>}
         <form onSubmit={onSubmit}>

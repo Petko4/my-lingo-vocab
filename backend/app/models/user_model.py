@@ -16,4 +16,6 @@ class User(Base):
     email = Column(String, unique=True, index=True, name="uq_users_email")
     hashed_password = Column(String)
     is_active = Column(Boolean, default=True)
+    native_language = Column(String)
+
     refresh_tokens = relationship("RefreshToken", back_populates="user")

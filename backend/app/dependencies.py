@@ -1,4 +1,5 @@
 from fastapi import Depends
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
 from app.core.database import SessionLocal
@@ -6,6 +7,7 @@ from app.services.user_service import UserService
 from app.services.password_service import PassswordService
 from app.services.token_service import TokenService
 from app.services.auth_service import AuthService
+from app.services.vocabulary_service import VocabularyService
 
 
 def get_db():
@@ -14,6 +16,10 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+def get_oauth_scheme():
+    return OAuth2PasswordBearer(tokenUrl="/auth/signin")
 
 
 def get_password_service():
@@ -34,3 +40,11 @@ def get_auth_service(db: Session = Depends(get_db),
                          get_password_service),
                      token_service: TokenService = Depends(get_token_service)):
     return AuthService(db, user_service, password_service, token_service)
+
+
+async def require_auth(token: str = Depends(get_oauth_scheme()), token_service: TokenService = Depends(get_token_service), db: Session = Depends(get_db)):
+    return await AuthService.get_current_user(token, token_service, db)
+
+
+def get_vocabulary_service(db: Session = Depends(get_db)):
+    return VocabularyService(db)

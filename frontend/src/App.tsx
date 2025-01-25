@@ -8,16 +8,15 @@ import {
   Toolbar,
 } from "@mui/material";
 import "./App.css";
-import { useContext } from "react";
 import { Logout, MenuBook, Person, School } from "@mui/icons-material";
-import { AuthContext } from "./contexts/AuthContext";
+import { useAuth } from "./contexts/AuthContext";
 import { VocabularyView } from "./views/VocabularyView";
 import { Route, Routes, useNavigate } from "react-router";
 import { ExerciseView } from "./views/ExerciseView";
 import { ProfileView } from "./views/ProfileView";
 
 export function App() {
-  const { signOut } = useContext(AuthContext);
+  const { signOut } = useAuth();
   const navigate = useNavigate();
 
   return (

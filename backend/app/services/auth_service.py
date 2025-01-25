@@ -64,6 +64,8 @@ class AuthService:
         if not db_token:
             raise InvalidTokenError("Token not found or expired")
 
+        return db_token.user_id
+
     def revoke_refresh_token(self, refresh_token: str):
         try:
             db_token = self._db.query(RefreshToken)\
@@ -99,9 +101,9 @@ class AuthService:
         token_service: TokenService,
         db: Session
     ):
-        print("in get_current_user")
         try:
             user_id = token_service.get_user_id_from_token(token)
+            print(f"user_id {user_id}")
             user = db.query(User).get(user_id)
             if not user:
                 raise UserNotFoundError

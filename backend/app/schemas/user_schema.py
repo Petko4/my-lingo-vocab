@@ -11,7 +11,10 @@ class UserCreate(BaseModel):
         pattern=r'^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$',
         examples=["pepa@example.com"])
     password: str
-    native_language: str
+    native_language: str = Field(min_length=2, max_length=20, error_messages={
+        "min_length": "source_language must have at least 2 characters.",
+        "max_length": "source_language must be no longer than 20 characters."
+    }, examples=["CZ"])
 
     @field_validator("password")
     def validate_password(cls, v):
@@ -36,13 +39,3 @@ class UserResponse(BaseModel):
     username: str
     email: str
     native_language: str
-
-
-# class UserLogin(BaseModel):
-#     username: str
-#     password: str
-
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str

@@ -3,7 +3,8 @@ from datetime import timedelta
 from fastapi import APIRouter, Depends, HTTPException, status, Response, Cookie
 from fastapi.security import OAuth2PasswordRequestForm
 
-from app.schemas import UserCreate, UserResponse, Token
+from app.schemas.user_schema import UserCreate, UserResponse
+from app.schemas.token_schema import Token
 from app.services.user_service import UserService
 from app.services.auth_service import AuthService
 from app.core.config import settings
@@ -23,7 +24,7 @@ router = APIRouter(
 @router.post("/signup")
 async def sign_user(user: UserCreate, user_service: UserService = Depends(get_user_service)) -> UserResponse:
     try:
-        new_user = user_service.add_user(
+        new_user = user_service.create_user(
             user.username, user.email, user.password, user.native_language)
         return new_user
 
@@ -34,9 +35,10 @@ async def sign_user(user: UserCreate, user_service: UserService = Depends(get_us
         )
 
     except DatabaseError as error:
+        print(f"{str(error)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(error)
+            detail="Something went wrong"
         )
 
 

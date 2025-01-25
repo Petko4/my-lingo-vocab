@@ -6,8 +6,10 @@ import {
   SpeedDialIcon,
   Typography,
 } from "@mui/material";
-import { CreateVocabularyForm } from "../components/CreateVocabularyForm";
+import { CreateVocabularyForm } from "../components/Vocabulary/CreateVocabularyForm";
 import { Route, Routes, useNavigate } from "react-router";
+import { VocabularyDetail } from "../components/Vocabulary/VocabularyDetail";
+import { VocabularyList } from "../components/Vocabulary/VocabularyList";
 
 export function VocabularyView() {
   const navigate = useNavigate();
@@ -17,7 +19,6 @@ export function VocabularyView() {
       <Box
         sx={{
           flexGrow: 1,
-          // paddingX: 5,
           justifyItems: "center",
           alignItems: "center",
           alignContent: "center",
@@ -25,6 +26,8 @@ export function VocabularyView() {
       >
         <Routes>
           <Route path="/create" element={<CreateVocabularyForm />} />
+          <Route path="/all" element={<VocabularyList />} />
+          <Route path="/:id" element={<VocabularyDetail />} />
         </Routes>
       </Box>
       <SpeedDial

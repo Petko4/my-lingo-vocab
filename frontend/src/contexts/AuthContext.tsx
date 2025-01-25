@@ -1,17 +1,25 @@
 import React, { createContext, useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { SignInFormData } from "../types/User";
-import { signInApi } from "../api/auth";
-import { ACCESS_TOKEN_REFRESH, API_URL } from "../constants";
+import { API_URL } from "../constants";
 
-interface AuthContext {
-  signIn: (data: SignInFormData) => Promise<void>;
-  signOut: () => Promise<void>;
+const PUBLIC_ROUTES = ["/signin", "/signup", "/reset-password"];
+
+const isPublicRoute = (path: string) => {
+  return PUBLIC_ROUTES.some((route) => route === path);
+};
+
+interface AuthContextProps {
   accessToken: string | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  signIn: (username: string, password: string) => Promise<void>;
+  signOut: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContext>({
+const AuthContext = createContext<AuthContextProps>({
   accessToken: null,
+  isAuthenticated: false,
+  isLoading: true,
   signIn: async () => {},
   signOut: async () => {},
 });
@@ -20,131 +28,119 @@ interface AuthProviderProps {
   children: React.ReactNode;
 }
 
-const AuthProvider = ({ children }: AuthProviderProps) => {
+export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [refreshTimer, setRefreshTimer] = useState<number | null>(null);
-
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+
   useEffect(() => {
     const initAuth = async () => {
+      const currentPath = window.location.pathname;
+
+      console.log("Current Path:", currentPath); // Debug: aktuální cesta
+      if (isPublicRoute(currentPath)) {
+        console.log("Public route detected. Skipping token refresh."); // Debug: veřejná routa
+        setIsLoading(false);
+        return;
+      }
+
       try {
+        console.log("Protected route detected. Attempting token refresh."); // Debug: chráněná routa
         await refreshAccessToken();
-      } catch (error) {}
+      } catch (error) {
+        console.error("Error during token refresh:", error);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     initAuth();
   }, []);
 
-  useEffect(() => {
-    const originalFetch = window.fetch;
-
-    window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
-      const requestInit: RequestInit = init || {};
-
-      if (accessToken) {
-        requestInit.headers = {
-          ...requestInit.headers,
-          Authorization: `Bearer ${accessToken}`,
-        };
-      }
-
-      requestInit.credentials = "include";
-
-      try {
-        const response = await originalFetch(input, requestInit);
-
-        if (response.status == 401) {
-          try {
-            const refreshResponse = await originalFetch(
-              `${API_URL}/auth/refresh`,
-              {
-                method: "POST",
-                credentials: "include",
-              }
-            );
-
-            if (!refreshResponse.ok) {
-              signOut();
-              throw new Error("Session expired");
-            }
-
-            const { access_token } = await refreshResponse.json();
-            setAccessToken(accessToken);
-
-            return originalFetch(input, {
-              ...requestInit,
-              headers: {
-                ...requestInit.headers,
-                Authorization: `Bearer ${access_token}`,
-              },
-            });
-          } catch (refreshError) {
-            signOut();
-            throw refreshError;
-          }
-        }
-        return response;
-      } catch (error) {
-        throw error;
-      }
-    };
-    return () => {
-      window.fetch = originalFetch;
-    };
-  }, [accessToken]);
-
-  // Unmount cleanup
-  useEffect(() => {
-    return () => {
-      if (refreshTimer) {
-        clearTimeout(refreshTimer);
-      }
-    };
-  }, [refreshTimer]);
-
   const refreshAccessToken = useCallback(async () => {
-    console.log("refreshAccessToken");
     try {
+      console.log("Refreshing access token..."); // Debug
       const response = await fetch(`${API_URL}/auth/refresh`, {
         method: "POST",
         credentials: "include",
       });
 
       if (!response.ok) {
-        throw Error("Failed to refresh token");
+        console.log("Refresh token request failed. Redirecting to /signin."); // Debug
+        throw new Error("Failed to refresh token");
       }
 
       const data = await response.json();
       setAccessToken(data.access_token);
-
-      const refreshTime = ACCESS_TOKEN_REFRESH;
-      const timer = setTimeout(refreshAccessToken, refreshTime);
-      setRefreshTimer(timer);
+      console.log("Access token refreshed:", data.access_token); // Debug
     } catch (error) {
-      console.log(error);
-      await signOut();
+      console.error("Error refreshing token:", error);
+      setAccessToken(null);
+      navigate("/signin");
     }
-  }, []);
+  }, [navigate]);
 
-  const signIn = async (data: SignInFormData) => {
+  // Initial auth check
+  // useEffect(() => {
+  //   const initializeAuth = async () => {
+  //     try {
+  //       await refreshAccessToken();
+  //     } catch (error) {
+  //       console.error(error);
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
+
+  //   initializeAuth();
+  // }, [refreshAccessToken]);
+
+  useEffect(() => {
+    let refreshInterval: number | null = null;
+
+    const startTokenRefresh = () => {
+      refreshInterval = setInterval(() => {
+        refreshAccessToken();
+      }, 15 * 60 * 1000); // Obnova každých 15 minut
+    };
+
+    if (accessToken) {
+      startTokenRefresh();
+    } else if (refreshInterval) {
+      clearInterval(refreshInterval);
+    }
+
+    return () => {
+      if (refreshInterval) {
+        clearInterval(refreshInterval);
+      }
+    };
+  }, [accessToken, refreshAccessToken]);
+
+  const signIn = async (username: string, password: string) => {
     try {
-      console.log("AuthContext - signIn");
-      const response = await signInApi(data);
+      // Vytvoření FormData
+      const formData = new FormData();
+      formData.append("username", username);
+      formData.append("password", password);
 
-      // if (!response.ok) {
-      //   throw new Error("Login failed");
-      // }
+      // Odeslání pomocí fetch
+      const response = await fetch(`${API_URL}/auth/signin`, {
+        method: "POST",
+        body: formData,
+        credentials: "include", // Pro práci s HttpOnly cookies
+      });
 
-      setAccessToken(response.access_token);
-      const refreshTime = ACCESS_TOKEN_REFRESH;
-      const timer = setTimeout(refreshAccessToken, refreshTime);
-      setRefreshTimer(timer);
+      if (!response.ok) {
+        throw new Error("Invalid credentials");
+      }
 
-      // DO some another stuff like load user info
-      navigate("/app/vocabulary");
+      const data = await response.json();
+      setAccessToken(data.access_token); // Uložení access tokenu do paměti
+      navigate("app/vocabulary"); // Přesměrování po úspěšném přihlášení
     } catch (error) {
-      console.error(error);
-      throw new Error("Invalid credentials");
+      console.error("Sign in failed:", error);
+      throw error;
     }
   };
 
@@ -155,21 +151,26 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
         credentials: "include",
       });
     } catch (error) {
-      console.error("Logout failed:", error);
+      console.error("Sign out failed:", error);
     } finally {
-      if (refreshTimer) {
-        clearTimeout(refreshTimer);
-      }
       setAccessToken(null);
       navigate("/signin");
     }
   };
 
   return (
-    <AuthContext.Provider value={{ accessToken, signIn, signOut }}>
+    <AuthContext.Provider
+      value={{
+        accessToken,
+        isAuthenticated: !!accessToken,
+        isLoading,
+        signIn,
+        signOut,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
-export { AuthProvider, AuthContext };
+export const useAuth = () => React.useContext(AuthContext);
